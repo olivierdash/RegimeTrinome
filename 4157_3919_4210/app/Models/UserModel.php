@@ -22,6 +22,16 @@ class UserModel extends Model
         'mot_de_passe' => 'required|min_length[8]',
     ];
 
+    protected $beforeInsert = ['hashPassword'];
+
+    protected function hashPassword(array $data)
+    {
+        if (isset($data['data']['mot_de_passe'])) {
+            $data['data']['mot_de_passe'] = password_hash($data['data']['mot_de_passe'], PASSWORD_DEFAULT);
+        }
+        return $data;
+    }
+
     // Messages d'erreurs personnalisés
     protected $validationMessages = [
         'nom' => [

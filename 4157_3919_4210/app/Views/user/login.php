@@ -12,18 +12,20 @@
     <div class="row">
         <div class="col-md-6">
             <form class="row g-3 needs-validation" action="<?= site_url('user/login') ?>" method="post" novalidate>
+                <?= csrf_field() ?>
+
                 <div class="col-md-4">
                     <label for="validationCustom01" class="form-label">Nom </label>
                     <input type="text" name="nom" class="form-control" id="validationCustom01" placeholder="Mark">
                     <div class="invalid-feedback">
-                        Veuillez entrer votre nom 
+                        Veuillez entrer votre nom
                     </div>
                 </div>
                 <div class="col-md-4">
                     <label for="validationCustom02" class="form-label">Email</label>
-                    <input type="email" name="email"  class="form-control" id="validationCustom02" placeholder="Otto@gmail.com">
+                    <input type="email" name="email" class="form-control" id="validationCustom02" placeholder="Otto@gmail.com">
                     <div class="invalid-feedback">
-                        Entrer un email non vide et dans un format valide 
+                        Entrer un email non vide et dans un format valide
                     </div>
                 </div>
                 <div class="form-check col-md-6">
