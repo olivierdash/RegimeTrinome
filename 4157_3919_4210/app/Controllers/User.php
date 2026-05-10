@@ -1,37 +1,69 @@
 <?php
+
 namespace App\Controllers;
 
-class User extends BaseController{
-    public function login(){
+use App\Models\UserModel;
+
+class User extends BaseController
+{
+    public function login()
+    {
         return view('user/login');
     }
 
-    public function createUser(){
-        $req = $this->request;
+    public function createUser()
+    {
+        $model = new UserModel();
+        $session = session();
 
-        $nom = trim($req->getPost('nom'));
-        $mail = trim($req->getPost('email'));
-        $password = trim($req->getPost('mot_de_passe'));
+        $userData = [
+            'nom'          => trim($this->request->getPost('nom')),
+            'email'        => trim($this->request->getPost('email')),
+            'mot_de_passe' => $this->request->getPost('mot_de_passe'),
+        ];
 
-        $data['errors'] = [];
-
-        if( $nom === '' ){
-            $data['errors']['nom'] = "Veuillez donner une valeur non vide au nom";
+        // On utilise validate() du modèle sans insérer
+        if (!$model->validate($userData)) {
+            return view('user/login', [
+                'errors' => $model->errors()
+            ]);
         }
 
-        if( $mail === '' ){
-            $data['errors']['email'] = "Veuillez donner une valeur valide au format d'un email";
+        $session->set('temp_user_data', $userData);
+        
+        return redirect()->to('user/step2'); // Redirige vers la vue taille/poids
+    }
+
+    public function savePhysicalData()
+    {
+        $session = session();
+        $model = new UserModel();
+
+        $rules = [
+            'taille' => 'required|is_natural_no_zero',
+            'poids'  => 'required|is_natural_no_zero'
+        ];
+
+        if (!$this->validate($rules)) {
+            return view('user/step2', [
+                'validation' => $this->validator
+            ]);
         }
 
-        if( $password === '' ){
-            $data['errors']['password'] = "Veuillez entrer un mot de passe automatique";
+        $step2Data = [
+            'taille' => $this->request->getPost('taille'),
+            'poids'  => $this->request->getPost('poids'),
+        ];
+
+        $tempData = $session->get('temp_user_data') ?? [];
+        $finalData = array_merge($tempData, $step2Data);
+
+        // Insertion finale en BDD
+        if ($model->insert($finalData) === false) {
+            return redirect()->back()->withInput()->with('errors', $model->errors());
         }
 
-        $hashed_password = hash($password, PASSWORD_DEFAULT);
-
-        /*
-        Un code appelant le modele pour inserer les donnees d'utilisateur
-        */
-
+        $session->remove('temp_user_data');
+        return redirect()->to('/login')->with('success', 'Compte créé avec succès !');
     }
 }
