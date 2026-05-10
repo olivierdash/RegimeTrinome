@@ -81,7 +81,13 @@ class Auth extends BaseController
 
         if ($data['mot_de_passe'] === '') {
             $errors['mot_de_passe'] = 'Le mot de passe est obligatoire.';
-        } 
+        } elseif (strlen($data['mot_de_passe']) < 8) {
+            $errors['mot_de_passe'] = 'Le mot de passe doit contenir au moins 8 caracteres.';
+        }
+
+        if (! in_array($data['genre'], ['Homme', 'Femme'], true)) {
+            $errors['genre'] = 'Le genre est obligatoire.';
+        }
 
         $userModel = model(UserModel::class);
         if ($data['email'] !== '' && $userModel->emailExists($data['email'])) {
@@ -106,6 +112,9 @@ class Auth extends BaseController
             'genre' => $data['genre'],
             'mot_de_passe' => password_hash($data['mot_de_passe'], PASSWORD_DEFAULT),
         ]);
+        if ($userId <= 0) {
+            return redirect()->to('/register')->with('error', 'Creation du compte impossible.');
+        }
 
         session()->set('pending_user_id', $userId);
 

@@ -1,12 +1,54 @@
 :root {
   --bs-body-bg: #f8f9fa;
-  --card-border-radius: 16px;
+  --card-border-radius: 8px;
+}
+body {
+  background: #f6f7f9;
+}
+.auth-page {
+  min-height: 100vh;
+  background: #eef2f6;
+}
+.auth-card,
+.app-card {
+  background: #fff;
+  border: 1px solid #e7ebf0;
+  border-radius: var(--card-border-radius);
+  box-shadow: 0 6px 18px rgba(18, 38, 63, 0.05);
+}
+.auth-card {
+  max-width: 440px;
+  padding: 2rem;
+}
+.app-card {
+  padding: 1.25rem;
+}
+.metric-card {
+  min-height: 138px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+.metric-card span {
+  color: #6c757d;
+  font-size: 0.78rem;
+  text-transform: uppercase;
+  letter-spacing: 0;
+  font-weight: 700;
+}
+.metric-card strong {
+  font-size: 1.45rem;
+  line-height: 1.25;
+  margin: 0.35rem 0;
+}
+.metric-card small {
+  color: #6c757d;
 }
 .profile-header {
   padding: 4rem 0 3rem;
   background: white;
   border-bottom: 1px solid #edf2f7;
-  margin-bottom: -4rem; /* Création du chevauchement */
+  margin-bottom: -4rem;
 }
 .stat-card {
   border: none;

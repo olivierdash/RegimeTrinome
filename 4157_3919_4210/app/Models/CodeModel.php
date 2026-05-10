@@ -13,7 +13,7 @@ class CodeModel extends Model
 
     public function findAvailableByNumber(string $number): ?array
     {
-        return $this->where('numero_code', $number)->where('est_utilise', 0)->first();
+        return $this->where('numero_code', strtoupper(trim($number)))->where('est_utilise', 0)->first();
     }
 
     public function orderedByNewest(): array

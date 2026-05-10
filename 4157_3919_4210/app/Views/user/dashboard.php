@@ -1,134 +1,109 @@
 <!DOCTYPE html>
-<html lang="en">
-
+<html lang="fr">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
-    <link rel="stylesheet" href="<?= site_url('assets/bootstrap/css/bootstrap.min.css') ?>">
+    <title><?= esc($title ?? 'Dashboard') ?></title>
+    <link rel="stylesheet" href="<?= base_url('assets/bootstrap/css/bootstrap.min.css') ?>">
+    <link rel="stylesheet" href="<?= base_url('assets/style.css') ?>">
 </head>
-
 <body>
+    <?= view('partials/user_nav') ?>
 
-    <div class="profile-header text-center">
-        <div class="container">
-            <div class="avatar-circle">
-                <?= strtoupper(substr(esc($user['nom']), 0, 1)) ?>
-            </div>
-            <h1 class="fw-bold h2 mb-1">Bonjour, <?= esc($user['nom']) ?></h1>
-            <p class="text-muted">Prêt pour vos objectifs d'aujourd'hui ?</p>
-        </div>
-    </div>
+    <main class="container py-4">
+        <?= view('partials/flash') ?>
 
-    <div class="container pb-5">
-        <!-- Métriques principales en Cartes -->
-        <div class="row g-4 mb-5">
-            <div class="col-md-4">
-                <div class="card stat-card h-100 p-3 text-center">
-                    <span class="metric-label mb-2 d-block">Indice de Masse Corporelle</span>
-                    <div class="metric-value"><?= number_format($imc, 1, ',', ' ') ?></div>
-                    <span class="badge bg-light text-dark align-self-center mt-2 px-3"><?= esc($imcStatus) ?></span>
-                </div>
+        <div class="d-flex justify-content-between align-items-start mb-4 gap-3 flex-wrap">
+            <div>
+                <h1 class="h3 fw-bold mb-1">Bonjour, <?= esc($user['nom']) ?></h1>
+                <p class="text-muted mb-0">Ton profil, ton budget et tes programmes au meme endroit.</p>
             </div>
-            <div class="col-md-4">
-                <div class="card stat-card h-100 p-3 text-center border-primary border-top border-4">
-                    <span class="metric-label mb-2 d-block">Solde Actuel</span>
-                    <div class="metric-value text-primary"><?= number_format($user['porte_monnaie'], 0, ',', ' ') ?> <small>Ar</small></div>
-                    <span class="text-muted small mt-2"><?= $user['est_gold'] ? '✨ Compte Gold actif (-15%)' : 'Compte Standard' ?></span>
-                </div>
-            </div>
-            <div class="col-md-4">
-                <div class="card stat-card h-100 p-3 text-center">
-                    <span class="metric-label mb-2 d-block">Poids Idéal</span>
-                    <div class="metric-value"><?= number_format($idealWeight, 1, ',', ' ') ?> <small>kg</small></div>
-                    <span class="text-muted small mt-2">Basé sur votre morphologie</span>
-                </div>
-            </div>
+            <a class="btn btn-primary" href="<?= site_url('dashboard/regimes') ?>">Voir les regimes</a>
         </div>
 
-        <!-- Navigation rapide (Espacement blanc généreux) -->
-        <div class="row g-4 mb-5 text-center">
-            <?php
-            $menu = [
-                ['Profil', 'person', 'profil', 'Gérer ma santé'],
-                ['Régimes', 'apple', 'regimes', 'Trouver un programme'],
-                ['Wallet', 'wallet2', 'wallet', 'Recharger mon compte'],
-                ['Suivi', 'graph-up', 'suivi', 'Historique d\'activités']
-            ];
-            foreach ($menu as $item):
-            ?>
-                <div class="col-6 col-lg-3">
-                    <a href="<?= site_url('dashboard/' . $item[2]) ?>" class="text-decoration-none p-4 d-block bg-white rounded-4 shadow-sm border border-light">
-                        <div class="h3 text-primary mb-2"><i class="bi bi-<?= $item[1] ?>"></i></div>
-                        <h6 class="text-dark fw-bold mb-1"><?= $item[0] ?></h6>
-                        <small class="text-muted d-none d-md-block"><?= $item[3] ?></small>
-                    </a>
+        <div class="row g-3 mb-4">
+            <div class="col-md-3">
+                <div class="app-card metric-card">
+                    <span>IMC</span>
+                    <strong><?= number_format($imc, 1, ',', ' ') ?></strong>
+                    <small><?= esc($imcStatus) ?></small>
                 </div>
-            <?php endforeach; ?>
+            </div>
+            <div class="col-md-3">
+                <div class="app-card metric-card">
+                    <span>Poids ideal</span>
+                    <strong><?= number_format($idealWeight, 1, ',', ' ') ?> kg</strong>
+                    <small>Reference IMC 22</small>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="app-card metric-card">
+                    <span>Solde</span>
+                    <strong><?= number_format((float) $user['porte_monnaie'], 0, ',', ' ') ?> Ar</strong>
+                    <small><?= (int) $user['est_gold'] === 1 ? 'Gold actif, remise 15%' : 'Compte standard' ?></small>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="app-card metric-card">
+                    <span>Gold</span>
+                    <strong><?= (int) $user['est_gold'] === 1 ? 'Actif' : number_format($goldPrice, 0, ',', ' ') . ' Ar' ?></strong>
+                    <small>Remise sur tous les regimes</small>
+                </div>
+            </div>
         </div>
 
-        <!-- Détails et Activités -->
         <div class="row g-4">
             <div class="col-lg-7">
-                <div class="card stat-card p-4">
-                    <div class="d-flex justify-content-between align-items-center mb-4">
-                        <h5 class="fw-bold mb-0">Derniers achats</h5>
-                        <a href="<?= site_url('dashboard/suivi') ?>" class="btn btn-sm btn-light text-primary fw-bold">Voir tout</a>
+                <div class="app-card">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h2 class="h5 fw-bold mb-0">Derniers achats</h2>
+                        <a href="<?= site_url('dashboard/suivi') ?>" class="btn btn-outline-secondary btn-sm">Tout voir</a>
                     </div>
                     <?php if (empty($achats)): ?>
-                        <div class="text-center py-4">
-                            <p class="text-muted">Aucun achat récent.</p>
-                        </div>
+                        <p class="text-muted mb-0">Aucun achat pour le moment.</p>
                     <?php else: ?>
-                        <table class="table table-clean mb-0">
-                            <thead>
-                                <tr>
-                                    <th>RÉGIME</th>
-                                    <th class="text-end">MONTANT</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <?php foreach (array_slice($achats, 0, 3) as $achat): ?>
+                        <div class="table-responsive">
+                            <table class="table align-middle">
+                                <tbody>
+                                <?php foreach (array_slice($achats, 0, 4) as $achat): ?>
                                     <tr>
                                         <td>
-                                            <span class="fw-bold d-block text-dark"><?= esc($achat['regime']) ?></span>
-                                            <small class="text-muted"><?= esc($achat['duree_jours']) ?> jours de suivi</small>
+                                            <strong><?= esc($achat['regime']) ?></strong><br>
+                                            <span class="text-muted small"><?= esc($achat['duree_jours']) ?> jours</span>
                                         </td>
-                                        <td class="text-end fw-bold"><?= number_format($achat['montant_total'], 0, ',', ' ') ?> Ar</td>
+                                        <td class="text-end"><?= number_format((float) $achat['montant_total'], 0, ',', ' ') ?> Ar</td>
                                     </tr>
                                 <?php endforeach; ?>
-                            </tbody>
-                        </table>
+                                </tbody>
+                            </table>
+                        </div>
                     <?php endif; ?>
                 </div>
             </div>
-
             <div class="col-lg-5">
-                <div class="card stat-card p-4">
-                    <h5 class="fw-bold mb-4">Recharges récentes</h5>
+                <div class="app-card">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h2 class="h5 fw-bold mb-0">Recharges</h2>
+                        <a href="<?= site_url('dashboard/wallet') ?>" class="btn btn-outline-secondary btn-sm">Wallet</a>
+                    </div>
                     <?php if (empty($recharges)): ?>
-                        <div class="text-center py-4">
-                            <p class="text-muted">Aucune recharge.</p>
-                        </div>
+                        <p class="text-muted mb-0">Aucune recharge.</p>
                     <?php else: ?>
-                        <div class="list-group list-group-flush">
-                            <?php foreach (array_slice($recharges, 0, 3) as $recharge): ?>
-                                <div class="list-group-item px-0 border-0 mb-3 d-flex justify-content-between align-items-center">
-                                    <div>
-                                        <code class="text-primary fw-bold"><?= esc($recharge['numero_code']) ?></code>
-                                        <div class="small text-muted"><?= number_format($recharge['montant'], 0, ',', ' ') ?> Ar</div>
-                                    </div>
-                                    <span class="status-badge bg-<?= ($recharge['statut'] == 'valide') ? 'success-subtle text-success' : 'warning-subtle text-warning' ?>">
-                                        <?= strtoupper(esc($recharge['statut'])) ?>
-                                    </span>
+                        <?php foreach (array_slice($recharges, 0, 4) as $recharge): ?>
+                            <div class="d-flex justify-content-between border-bottom py-2">
+                                <div>
+                                    <strong><?= esc($recharge['numero_code']) ?></strong><br>
+                                    <span class="text-muted small"><?= number_format((float) $recharge['montant'], 0, ',', ' ') ?> Ar</span>
                                 </div>
-                            <?php endforeach; ?>
-                        </div>
+                                <span class="badge text-bg-light align-self-center"><?= esc($recharge['statut']) ?></span>
+                            </div>
+                        <?php endforeach; ?>
                     <?php endif; ?>
                 </div>
             </div>
         </div>
-    </div>
-</body>
+    </main>
 
+    <script src="<?= base_url('assets/bootstrap/js/bootstrap.bundle.min.js') ?>"></script>
+</body>
 </html>

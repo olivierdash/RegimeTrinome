@@ -15,7 +15,7 @@ class Admin extends BaseController
 {
     public function login(): string
     {
-        return view('admin/login', ['title' => 'Back-office']);
+        return view('admin/login', ['title' => 'Back-office', 'values' => []]);
     }
 
     public function attemptLogin()
@@ -74,6 +74,7 @@ class Admin extends BaseController
             'title' => 'Regimes',
             'regimes' => model(RegimeModel::class)->allWithObjective(),
             'objectifs' => model(ObjectiveModel::class)->ordered(),
+            'activities' => model(ActivityModel::class)->orderedByName(),
         ]);
     }
 
@@ -90,7 +91,27 @@ class Admin extends BaseController
             'pourcentage_volaille' => (float) $this->request->getPost('pourcentage_volaille'),
         ];
         $id = (int) $this->request->getPost('id');
-        model(RegimeModel::class)->saveFromForm($data, $id);
+        $activityId = (int) $this->request->getPost('id_activite');
+        $duration = (int) $this->request->getPost('duree_minutes_jour');
+
+        if ($data['nom'] === '' || $data['prix_journalier'] <= 0 || $data['id_objectif'] <= 0) {
+            return redirect()->to('/admin/regimes')->with('error', 'Nom, objectif et prix sont obligatoires.');
+        }
+
+        $totalComposition = $data['pourcentage_viande'] + $data['pourcentage_poisson'] + $data['pourcentage_volaille'];
+        if (abs($totalComposition - 100) > 0.01) {
+            return redirect()->to('/admin/regimes')->with('error', 'La composition viande/poisson/volaille doit totaliser 100%.');
+        }
+
+        $regimeModel = model(RegimeModel::class);
+        if ($id > 0) {
+            $regimeModel->update($id, $data);
+            $regimeId = $id;
+        } else {
+            $regimeId = (int) $regimeModel->insert($data);
+        }
+
+        $regimeModel->replaceSportSuggestion($regimeId, $activityId, $duration);
 
         return redirect()->to('/admin/regimes')->with('success', 'Regime enregistre.');
     }
@@ -98,7 +119,11 @@ class Admin extends BaseController
     public function deleteRegime(int $id)
     {
         $this->requireAdmin();
-        model(RegimeModel::class)->delete($id);
+        try {
+            model(RegimeModel::class)->delete($id);
+        } catch (\Throwable $e) {
+            return redirect()->to('/admin/regimes')->with('error', 'Suppression impossible: ce regime est peut-etre deja achete.');
+        }
 
         return redirect()->to('/admin/regimes')->with('success', 'Regime supprime.');
     }
@@ -120,6 +145,10 @@ class Admin extends BaseController
             'designation' => trim((string) $this->request->getPost('designation')),
             'calories_moyennes_heure' => (int) $this->request->getPost('calories_moyennes_heure'),
         ];
+        if ($data['designation'] === '' || $data['calories_moyennes_heure'] <= 0) {
+            return redirect()->to('/admin/activites')->with('error', 'Designation et calories sont obligatoires.');
+        }
+
         $id = (int) $this->request->getPost('id');
         model(ActivityModel::class)->saveFromForm($data, $id);
 
@@ -129,9 +158,50 @@ class Admin extends BaseController
     public function deleteActivity(int $id)
     {
         $this->requireAdmin();
-        model(ActivityModel::class)->delete($id);
+        try {
+            model(ActivityModel::class)->delete($id);
+        } catch (\Throwable $e) {
+            return redirect()->to('/admin/activites')->with('error', 'Suppression impossible.');
+        }
 
         return redirect()->to('/admin/activites')->with('success', 'Activite supprimee.');
+    }
+
+    public function objectives(): string
+    {
+        $this->requireAdmin();
+
+        return view('admin/objectives', [
+            'title' => 'Objectifs',
+            'objectifs' => model(ObjectiveModel::class)->ordered(),
+        ]);
+    }
+
+    public function saveObjective()
+    {
+        $this->requireAdmin();
+        $data = ['libelle' => trim((string) $this->request->getPost('libelle'))];
+        $id = (int) $this->request->getPost('id');
+
+        if ($data['libelle'] === '') {
+            return redirect()->to('/admin/objectifs')->with('error', 'Le libelle est obligatoire.');
+        }
+
+        model(ObjectiveModel::class)->saveFromForm($data, $id);
+
+        return redirect()->to('/admin/objectifs')->with('success', 'Objectif enregistre.');
+    }
+
+    public function deleteObjective(int $id)
+    {
+        $this->requireAdmin();
+        try {
+            model(ObjectiveModel::class)->delete($id);
+        } catch (\Throwable $e) {
+            return redirect()->to('/admin/objectifs')->with('error', 'Suppression impossible: cet objectif est utilise par un regime.');
+        }
+
+        return redirect()->to('/admin/objectifs')->with('success', 'Objectif supprime.');
     }
 
     public function codes(): string
@@ -153,7 +223,20 @@ class Admin extends BaseController
             'est_utilise' => (int) ($this->request->getPost('est_utilise') === '1'),
         ];
         $id = (int) $this->request->getPost('id');
-        model(CodeModel::class)->saveFromForm($data, $id);
+        if ($data['numero_code'] === '' || $data['montant'] <= 0) {
+            return redirect()->to('/admin/codes')->with('error', 'Numero et montant sont obligatoires.');
+        }
+
+        $codeModel = model(CodeModel::class);
+        $existing = $codeModel->where('numero_code', $data['numero_code']);
+        if ($id > 0) {
+            $existing->where('id !=', $id);
+        }
+        if ($existing->first()) {
+            return redirect()->to('/admin/codes')->with('error', 'Ce code existe deja.');
+        }
+
+        $codeModel->saveFromForm($data, $id);
 
         return redirect()->to('/admin/codes')->with('success', 'Code enregistre.');
     }
@@ -161,7 +244,11 @@ class Admin extends BaseController
     public function deleteCode(int $id)
     {
         $this->requireAdmin();
-        model(CodeModel::class)->delete($id);
+        try {
+            model(CodeModel::class)->delete($id);
+        } catch (\Throwable $e) {
+            return redirect()->to('/admin/codes')->with('error', 'Suppression impossible: ce code est lie a une recharge.');
+        }
 
         return redirect()->to('/admin/codes')->with('success', 'Code supprime.');
     }

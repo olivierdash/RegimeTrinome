@@ -101,11 +101,11 @@ INSERT INTO objectif (libelle) VALUES
 ('Atteindre son IMC ideal');
 
 INSERT INTO utilisateur (nom, email, genre, mot_de_passe, taille, poids, porte_monnaie, est_gold) VALUES
-('Jean', 'jean@mail.com', 'Homme', '$2y$10$nI390pxNsDxTNeVX4WBjF.RFAa4//H0TvJjuaTd8u0iEnOgBlaO/e', 180, 75, 80000, 0),
-('Liana', 'liana@mail.com', 'Femme', '$2y$10$nI390pxNsDxTNeVX4WBjF.RFAa4//H0TvJjuaTd8u0iEnOgBlaO/e', 165, 55, 60000, 1),
-('Mickael', 'mike@mail.com', 'Homme', '$2y$10$nI390pxNsDxTNeVX4WBjF.RFAa4//H0TvJjuaTd8u0iEnOgBlaO/e', 175, 90, 45000, 0),
-('Sarah', 'sarah@mail.com', 'Femme', '$2y$10$nI390pxNsDxTNeVX4WBjF.RFAa4//H0TvJjuaTd8u0iEnOgBlaO/e', 160, 68, 70000, 0),
-('Toky', 'toky@mail.com', 'Homme', '$2y$10$nI390pxNsDxTNeVX4WBjF.RFAa4//H0TvJjuaTd8u0iEnOgBlaO/e', 170, 60, 30000, 0);
+('Jean', 'jean@mail.com', 'Homme', '$2y$10$MOBzeov4xXU6Br5BbK0/5.mnbIx2WzMX6JsPbPtTy58nMlkaVGjzu', 180, 75, 80000, 0),
+('Liana', 'liana@mail.com', 'Femme', '$2y$10$MOBzeov4xXU6Br5BbK0/5.mnbIx2WzMX6JsPbPtTy58nMlkaVGjzu', 165, 55, 60000, 1),
+('Mickael', 'mike@mail.com', 'Homme', '$2y$10$MOBzeov4xXU6Br5BbK0/5.mnbIx2WzMX6JsPbPtTy58nMlkaVGjzu', 175, 90, 45000, 0),
+('Sarah', 'sarah@mail.com', 'Femme', '$2y$10$MOBzeov4xXU6Br5BbK0/5.mnbIx2WzMX6JsPbPtTy58nMlkaVGjzu', 160, 68, 70000, 0),
+('Toky', 'toky@mail.com', 'Homme', '$2y$10$MOBzeov4xXU6Br5BbK0/5.mnbIx2WzMX6JsPbPtTy58nMlkaVGjzu', 170, 60, 30000, 0);
 
 INSERT INTO regime (id_objectif, nom, prix_journalier, poids_par_jour, pourcentage_viande, pourcentage_poisson, pourcentage_volaille) VALUES
 (1, 'Mass Gain Pro', 15000, 0.200, 40, 30, 30),

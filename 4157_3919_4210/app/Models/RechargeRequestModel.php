@@ -48,7 +48,7 @@ class RechargeRequestModel extends Model
 
     public function findWithAmount(int $id): ?array
     {
-        return $this->select('recharge_demande.*, code.montant')
+        return $this->select('recharge_demande.*, code.montant, code.est_utilise')
             ->join('code', 'code.id = recharge_demande.id_code')
             ->where('recharge_demande.id', $id)
             ->first();
@@ -57,7 +57,7 @@ class RechargeRequestModel extends Model
     public function validateRecharge(int $id): bool
     {
         $row = $this->findWithAmount($id);
-        if (! $row || $row['statut'] !== 'en_attente') {
+        if (! $row || $row['statut'] !== 'en_attente' || (int) $row['est_utilise'] === 1) {
             return false;
         }
 
@@ -77,8 +77,7 @@ class RechargeRequestModel extends Model
     {
         return $this->where('id', $id)
             ->where('statut', 'en_attente')
-            ->set(['statut' => 'refuse', 'date_validation' => date('Y-m-d H:i:s')])
-            ->update();
+            ->update(null, ['statut' => 'refuse', 'date_validation' => date('Y-m-d H:i:s')]);
     }
 
     public function countPending(): int

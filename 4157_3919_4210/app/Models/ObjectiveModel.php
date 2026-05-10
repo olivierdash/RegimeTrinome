@@ -15,4 +15,13 @@ class ObjectiveModel extends Model
     {
         return $this->orderBy('id')->findAll();
     }
+
+    public function saveFromForm(array $data, int $id = 0): bool
+    {
+        if ($id > 0) {
+            return $this->update($id, $data);
+        }
+
+        return (bool) $this->insert($data);
+    }
 }

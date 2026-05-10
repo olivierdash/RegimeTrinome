@@ -22,8 +22,9 @@ class PurchaseModel extends Model
 
     public function findForExport(int $purchaseId, int $userId): ?array
     {
-        return $this->select('achat_regime.*, regime.nom regime, regime.poids_par_jour, regime.pourcentage_viande, regime.pourcentage_poisson, regime.pourcentage_volaille')
+        return $this->select('achat_regime.*, regime.nom regime, regime.poids_par_jour, regime.pourcentage_viande, regime.pourcentage_poisson, regime.pourcentage_volaille, objectif.libelle objectif')
             ->join('regime', 'regime.id = achat_regime.id_regime')
+            ->join('objectif', 'objectif.id = regime.id_objectif')
             ->where('achat_regime.id', $purchaseId)
             ->where('achat_regime.id_utilisateur', $userId)
             ->first();
@@ -31,6 +32,10 @@ class PurchaseModel extends Model
 
     public function createWithWalletDebit(array $user, array $regime, int $duration, float $total): bool
     {
+        if ((float) $user['porte_monnaie'] < $total || $duration <= 0) {
+            return false;
+        }
+
         $this->db->transStart();
         $this->db->table('utilisateur')->where('id', $user['id'])->update([
             'porte_monnaie' => ((float) $user['porte_monnaie']) - $total,
@@ -45,6 +50,11 @@ class PurchaseModel extends Model
         $this->db->transComplete();
 
         return $this->db->transStatus();
+    }
+
+    public function purchaseCount(): int
+    {
+        return $this->countAllResults();
     }
 
     public function totalSales(): float
