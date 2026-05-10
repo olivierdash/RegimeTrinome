@@ -11,7 +11,6 @@ class User extends BaseController
         return view('user/login');
     }
 
-    // ÉTAPE 1 : Validation et stockage temporaire
     public function createUser()
     {
         $model = new UserModel();
@@ -30,13 +29,11 @@ class User extends BaseController
             ]);
         }
 
-        // On stocke en session et on passe à la suite
         $session->set('temp_user_data', $userData);
         
         return redirect()->to('user/step2'); // Redirige vers la vue taille/poids
     }
 
-    // ÉTAPE 2 : Fusion et insertion finale
     public function savePhysicalData()
     {
         $session = session();
@@ -58,7 +55,6 @@ class User extends BaseController
             'poids'  => $this->request->getPost('poids'),
         ];
 
-        // Fusion des données de l'étape 1 et 2
         $tempData = $session->get('temp_user_data') ?? [];
         $finalData = array_merge($tempData, $step2Data);
 
