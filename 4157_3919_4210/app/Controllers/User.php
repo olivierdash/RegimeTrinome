@@ -1,37 +1,36 @@
 <?php
 namespace App\Controllers;
 
-class User extends BaseController{
-    public function login(){
+use App\Models\UserModel;
+
+class User extends BaseController {
+
+    public function login() {
         return view('user/login');
     }
 
-    public function createUser(){
-        $req = $this->request;
+    public function createUser() {
+        $model = new UserModel();
 
-        $nom = trim($req->getPost('nom'));
-        $mail = trim($req->getPost('email'));
-        $password = trim($req->getPost('mot_de_passe'));
+        $passwordRaw = $this->request->getPost('mot_de_passe');
+        
+        $userData = [
+            'nom'          => trim($this->request->getPost('nom')),
+            'email'        => trim($this->request->getPost('email')),
+            'mot_de_passe' => $passwordRaw, // On valide le clair avant de hasher
+        ];
 
-        $data['errors'] = [];
-
-        if( $nom === '' ){
-            $data['errors']['nom'] = "Veuillez donner une valeur non vide au nom";
+        if ($model->insert($userData) === false) {
+            return view('user/login', [
+                'errors' => $model->errors()
+            ]);
         }
 
-        if( $mail === '' ){
-            $data['errors']['email'] = "Veuillez donner une valeur valide au format d'un email";
-        }
+        // Succès
+        return redirect()->to('/login')->with('success', 'Utilisateur créé avec succès');
+    }
 
-        if( $password === '' ){
-            $data['errors']['password'] = "Veuillez entrer un mot de passe automatique";
-        }
-
-        $hashed_password = hash($password, PASSWORD_DEFAULT);
-
-        /*
-        Un code appelant le modele pour inserer les donnees d'utilisateur
-        */
-
+    public function createHealth(){
+        
     }
 }
