@@ -14,14 +14,14 @@
             <form class="row g-3 needs-validation" action="<?= site_url('user/login') ?>" method="post" novalidate>
                 <div class="col-md-4">
                     <label for="validationCustom01" class="form-label">Nom </label>
-                    <input type="text" class="form-control" id="validationCustom01" placeholder="Mark">
+                    <input type="text" name="nom" class="form-control" id="validationCustom01" placeholder="Mark">
                     <div class="invalid-feedback">
                         Veuillez entrer votre nom 
                     </div>
                 </div>
                 <div class="col-md-4">
                     <label for="validationCustom02" class="form-label">Email</label>
-                    <input type="email" class="form-control" id="validationCustom02" placeholder="Otto@gmail.com">
+                    <input type="email" name="email"  class="form-control" id="validationCustom02" placeholder="Otto@gmail.com">
                     <div class="invalid-feedback">
                         Entrer un email non vide et dans un format valide 
                     </div>
