@@ -12,6 +12,8 @@
     <div class="row">
         <div class="col-md-6">
             <form class="row g-3 needs-validation" action="<?= site_url('user/login') ?>" method="post" novalidate>
+                <?= csrf_field() ?>
+
                 <div class="col-md-4">
                     <label for="validationCustom01" class="form-label">Taille </label>
                     <input type="number" name="taille" id="validationCustom01" placeholder="Taille (en cm)">
@@ -23,7 +25,7 @@
                     <label for="validationCustom02" class="form-label">Poids</label>
                     <input type="number" class="form-control" id="validationCustom02">
                     <div class="invalid-feedback">
-                        Le poids doit etre un nombre entier positif 
+                        Le poids doit etre un nombre entier positif
                     </div>
                 </div>
                 <div class="col-12">
